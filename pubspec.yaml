@@ -1,6 +1,6 @@
 name: otel_firebase_app_check
 description: "Dartastic OpenTelemetry bridge for Firebase App Check (providers, attestation, token validation)."
-version: 0.1.0-beta.2
+version: 0.1.0-beta.3-wip
 repository: https://github.com/dartastic/otel_firebase_app_check
 homepage: https://dartastic.io
 publish_to: https://pub.dartastic.io
