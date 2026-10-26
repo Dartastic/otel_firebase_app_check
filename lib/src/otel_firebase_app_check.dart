@@ -1,15 +1,16 @@
-// Licensed under the Dartastic Pro Software License Agreement.
+// Licensed under the Apache License, Version 2.0
 // Copyright 2025-2026 Mindful Software LLC d/b/a Dartastic.io, All rights reserved.
 
-import 'package:dartastic_opentelemetry/dartastic_opentelemetry.dart';
+import 'package:dartastic_opentelemetry_api/dartastic_opentelemetry_api.dart';
 
 import 'otel_firebase_app_check_suppression.dart';
 
 const _tracerName = 'dartastic_otel_libs_firebase_app_check';
 
-Tracer _tracer() => OTel.tracerProvider().getTracer(_tracerName);
+APITracer _tracer() => OTelAPI.tracerProvider().getTracer(_tracerName);
 
 class FirebaseAppCheckResult {
+  /// Creates a result.
   const FirebaseAppCheckResult({
     this.providerKind,
     this.tokenIssuedAtSec,
@@ -51,8 +52,13 @@ class FirebaseAppCheckResult {
   final int? statusCode;
 }
 
+/// What a traced call returned: the value for the caller plus fields
+/// recorded on the span.
 class FirebaseAppCheckCallResult<T> {
+  /// Creates a call result.
   const FirebaseAppCheckCallResult({required this.value, this.result});
+
+  /// The value returned to the caller.
   final T value;
   final FirebaseAppCheckResult? result;
 }
@@ -77,7 +83,7 @@ Future<T> tracedFirebaseAppCheck<T>({
   final span = _tracer().startSpan(
     'firebase_app_check $operation',
     kind: SpanKind.client,
-    attributes: OTel.attributesFromMap(m),
+    attributes: OTelAPI.attributesFromMap(m),
   );
   try {
     final r = await invoke();
@@ -85,55 +91,55 @@ Future<T> tracedFirebaseAppCheck<T>({
       final res = r.result!;
       final extras = <Attribute<Object>>[];
       if (res.providerKind != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'firebase_app_check.provider.kind',
           res.providerKind!,
         ));
       }
       if (res.tokenIssuedAtSec != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'firebase_app_check.token.issued_at_sec',
           res.tokenIssuedAtSec!,
         ));
       }
       if (res.tokenExpiresAtSec != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'firebase_app_check.token.expires_at_sec',
           res.tokenExpiresAtSec!,
         ));
       }
       if (res.tokenCached != null) {
-        extras.add(OTel.attributeBool(
+        extras.add(OTelAPI.attributeBool(
           'firebase_app_check.token.cached',
           res.tokenCached!,
         ));
       }
       if (res.tokenForceRefresh != null) {
-        extras.add(OTel.attributeBool(
+        extras.add(OTelAPI.attributeBool(
           'firebase_app_check.token.force_refresh',
           res.tokenForceRefresh!,
         ));
       }
       if (res.debugTokenUsed != null) {
-        extras.add(OTel.attributeBool(
+        extras.add(OTelAPI.attributeBool(
           'firebase_app_check.debug.token_used',
           res.debugTokenUsed!,
         ));
       }
       if (res.tokenAutoRefreshEnabled != null) {
-        extras.add(OTel.attributeBool(
+        extras.add(OTelAPI.attributeBool(
           'firebase_app_check.token.auto_refresh_enabled',
           res.tokenAutoRefreshEnabled!,
         ));
       }
       if (res.tokenLength != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'firebase_app_check.token.length',
           res.tokenLength!,
         ));
       }
       if (res.errorCode != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'firebase_app_check.error.code',
           res.errorCode!,
         ));
@@ -143,7 +149,7 @@ Future<T> tracedFirebaseAppCheck<T>({
         );
       }
       if (res.statusCode != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'http.response.status_code',
           res.statusCode!,
         ));
@@ -154,13 +160,13 @@ Future<T> tracedFirebaseAppCheck<T>({
           );
         }
       }
-      if (extras.isNotEmpty) span.addAttributes(OTel.attributes(extras));
+      if (extras.isNotEmpty) span.addAttributes(OTelAPI.attributes(extras));
     }
     return r.value;
   } catch (e, st) {
-    span.addAttributes(OTel.attributes([
-      OTel.attributeString(
-        ErrorResource.errorType.key,
+    span.addAttributes(OTelAPI.attributes([
+      OTelAPI.attributeString(
+        ErrorAttributes.errorType.key,
         e.runtimeType.toString(),
       ),
     ]));
